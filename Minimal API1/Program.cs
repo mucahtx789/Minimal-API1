@@ -71,6 +71,12 @@ namespace Minimal_API1
                 return db.Employee.Where(x => x.EmployeeId == employee.EmployeeId).FirstOrDefault();
             });
 
+            app.MapPost("/employee", ([FromServices] EmployeeDbContext db, Employee employee) =>
+            {
+                db.Employee.Add(employee);
+                db.SaveChanges();
+                return db.Employee.ToList();
+            });
 
             /* app.MapGet("/musteriler", (Func<List< Employee >>)(() =>
              {
