@@ -8,7 +8,10 @@
         {
             this.db = db;
         }
-
+        public Employee GetEmployeeById(string id)
+        {
+            return db.Employee.Where(x => x.EmployeeId == id).FirstOrDefault();
+        }
         public List<Employee> GetEmployees()
         {
             return db.Employee.ToList();
@@ -27,5 +30,7 @@
             db.SaveChanges();
             return db.Employee.ToList();
         }
+
+        
     }
 }

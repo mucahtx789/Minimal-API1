@@ -14,10 +14,15 @@ namespace Minimal_API1
 
           //  string connectionString2 = "SERVER=DESKTOP-VI5LI79;Database=EmployeeDb;Trusted_Connection=True;TrustServerCertificate=True";
             var connectionString = builder.Configuration.GetConnectionString("AppDb");
-            
-            builder.Services.AddDbContext<EmployeeDbContext>(x =>x.UseSqlServer(connectionString));
 
             builder.Services.AddTransient<DataSeeder>();
+
+            //IDataReporsitory register hatasý için
+            builder.Services.AddScoped<IDataReporsitory,DataReporsitory>();
+
+            builder.Services.AddDbContext<EmployeeDbContext>(x =>x.UseSqlServer(connectionString));
+
+            
 
             var app = builder.Build();
 
@@ -48,35 +53,37 @@ namespace Minimal_API1
                      EmployeeName = "Mücahit",
                      EmployeeCountry = "Turkey"
                  };
-             }));*/
+             }));
 
             //proje  <LangVersion>preview</LangVersion> fromservice
             app.MapGet("/employee/{id}", ([FromServices] EmployeeDbContext db, string id) =>
             {
                 return db.Employee.Where(x=>x.EmployeeId==id).FirstOrDefault();
+            }); */
+
+            app.MapGet("/employee/{id}", ([FromServices] IDataReporsitory db, string id) =>
+            {
+                return db.GetEmployeeById(id);
             });
 
-          
-            app.MapGet("/employees", ([FromServices] EmployeeDbContext db) =>
+            app.MapGet("/employees", ([FromServices] IDataReporsitory db) =>
             {
-                return db.Employee.ToList();
+                return db.GetEmployees();
             }
 
             );
 
-            app.MapPut("/employee/{id}", ([FromServices] EmployeeDbContext db, Employee employee) =>
+            app.MapPut("/employee/{id}", ([FromServices] IDataReporsitory db, Employee employee) =>
             {
-                db.Employee.Update(employee);
-                db.SaveChanges();
-                return db.Employee.Where(x => x.EmployeeId == employee.EmployeeId).FirstOrDefault();
+               return db.PutEmployee(employee);
             });
 
-            app.MapPost("/employee", ([FromServices] EmployeeDbContext db, Employee employee) =>
+            app.MapPost("/employee", ([FromServices] IDataReporsitory db, Employee employee) =>
             {
-                db.Employee.Add(employee);
-                db.SaveChanges();
-                return db.Employee.ToList();
+                return db.AddEmployee(employee);
             });
+
+
 
             /* app.MapGet("/musteriler", (Func<List< Employee >>)(() =>
              {
