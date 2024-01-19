@@ -22,9 +22,14 @@ namespace Minimal_API1
 
             builder.Services.AddDbContext<EmployeeDbContext>(x =>x.UseSqlServer(connectionString));
 
-            
+            //swagger
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
+
+            //swager
+            app.UseSwaggerUI();
 
             if (args.Length ==1 && args[0].ToLower()=="seeddata")
                 SeedData(app);
@@ -60,6 +65,10 @@ namespace Minimal_API1
             {
                 return db.Employee.Where(x=>x.EmployeeId==id).FirstOrDefault();
             }); */
+
+            //swagger
+            app.UseSwagger(x => x.SerializeAsV2 = true);
+
 
             app.MapGet("/employee/{id}", ([FromServices] IDataReporsitory db, string id) =>
             {
